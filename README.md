@@ -1,4 +1,5 @@
-# vk-dialogue-export.py - VKontakte Dialogue Exporter
+# vk-dialogue-export.py
+## VKontakte Dialogue Exporter
 
 A tool to export dialogue with specific interlocutor.
 
@@ -12,7 +13,7 @@ At the top of script:
 	#############################
 
 	# vk login/password
-	login = 'example@example.com'
+	login = 'example@yandex.com'
 	password = 'password'
 
 	# ID of the interlocutor
@@ -23,4 +24,4 @@ At the top of script:
 
 ### NOTES
 
-Script uses [https://github.com/dzhioev/vk_api_auth](https://github.com/dzhioev/vk_api_auth) to simplify buisness with OAuth.
+Script uses [https://github.com/dzhioev/vk_api_auth](https://github.com/dzhioev/vk_api_auth) to simplify business with OAuth.
