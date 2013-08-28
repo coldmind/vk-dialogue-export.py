@@ -5,8 +5,6 @@ A tool to export dialogue with specific interlocutor.
 
 ## USAGE
 
-Install requirements from requirements.txt
-
 Edit vk-dialogue-export.py file and run.
 At the top of script:
 
