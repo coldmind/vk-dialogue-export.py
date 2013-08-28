@@ -1,22 +1,35 @@
 # -*- coding: utf-8 -*-
 
-import vkontakte
 import vk_auth
+
+import json
+import urllib2
+from urllib import urlencode
+
 import codecs
 import sys
 import time
 import datetime
 
+
 #############################
 
 # vk login/password
-login = 'example@example.com'
+login = 'example@yandex.com'
 password = 'password'
 
 # ID of the interlocutor
 dialogue_id = 11111111
 
 #############################
+
+
+def api(method, params, token):
+    params.append(("access_token", token))
+    url = "https://api.vk.com/method/%s?%s" % (method, urlencode(params))
+    return json.loads(urllib2.urlopen(url).read())["response"]
+
+
 try:
     (token, user_id) = vk_auth.auth(login,
                                     password,
@@ -25,11 +38,9 @@ try:
 except RuntimeError:
     sys.exit("Incorrect login/password. Please check it.")
 
-vk = vkontakte.API(token=token)
-
 print "vk autorized"
 
-messages = vk.messages.getHistory(uid=dialogue_id)
+messages = api("messages.getHistory", [("uid", dialogue_id)], token)
 
 cnt = messages[0]
 print "Count of messages: %s" % cnt
@@ -51,7 +62,9 @@ for i in range(1, 100):
         pass
 
 # Export details from uids
-human_details = vk.users.get(uids=','.join(str(v) for v in human_uids))
+human_details = api("users.get",
+                    [("uids", ','.join(str(v) for v in human_uids))],
+                    token)
 
 
 def write_message(who, to_write):
@@ -71,10 +84,12 @@ while mess != cnt:
     # Try to retrieve info anyway
     while True:
         try:
-            message_part = vk.messages.getHistory(uid=dialogue_id,
-                                                  offset=mess,
-                                                  count=max_part,
-                                                  rev=1)
+            message_part = api("messages.getHistory",
+                               [("uid", dialogue_id),
+                                ("offset", mess),
+                                ("count", max_part),
+                                ("rev", 1)],
+                               token)
         except:
             continue
         break
