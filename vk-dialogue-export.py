@@ -11,17 +11,14 @@ import sys
 import time
 import datetime
 
+import ConfigParser
 
-#############################
 
-# vk login/password
-login = 'example@yandex.com'
-password = 'password'
-
-# ID of the interlocutor
-dialogue_id = 11111111
-
-#############################
+Config = ConfigParser.ConfigParser()
+Config.read("config.ini")
+login = Config.get("auth", "username")
+password = Config.get("auth", "password")
+dialogue_id = Config.getint("dump", "interlocutor.id")
 
 
 def api(method, params, token):
