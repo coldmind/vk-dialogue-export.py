@@ -44,19 +44,17 @@ try:
 except RuntimeError:
     sys.exit("Incorrect login/password. Please check it.")
 
-sys.stdout.write('Authorized vk')
+sys.stdout.write('Authorized vk\n')
 
 # get some information about chat
 
 selector = "chat_id" if is_chat else "uid"
 messages = _api("messages.getHistory", [(selector, messages_id)], token)
 
-cnt = messages[0]
-sys.stdout.write("Count of messages: %s" % cnt)
-
-file_suffix = ('ui' if not is_chat else 'c')
-filename = ('vk_exported_dialogue_' + file_suffix + "%s.txt") % messages_id
-out = codecs.open(filename, "w+", "utf-8")
+out = codecs.open(
+    'vk_exported_dialogue_%s%s.txt' % ('ui' if not is_chat else 'c', messages_id),
+    "w+", "utf-8"
+)
 
 human_uids = [messages[1]["uid"]]
 
@@ -81,12 +79,12 @@ for human_detail in human_details:
     human_details_index[human_detail["uid"]] = human_detail
 
 def write_message(who, to_write):
-    out.write('[{date}] {full_name}:\n {message} \n\n\n'.format({
+    out.write(u'[{date}] {full_name}:\n {message} \n\n\n'.format(**{
             'date': datetime.datetime.fromtimestamp(
                 int(to_write["date"])).strftime('%Y-%m-%d %H:%M:%S'),
 
-            'full_name': human_details_index[who]["first_name"]
-                         + human_details_index[who]["last_name"],
+            'full_name': '%s %s' % (
+                human_details_index[who]["first_name"], human_details_index[who]["last_name"]),
 
             'message': to_write["body"].replace('<br>', '\n')
         }
@@ -95,6 +93,9 @@ def write_message(who, to_write):
 
 mess = 0
 max_part = 200  # Due to vk.api
+
+cnt = messages[0]
+sys.stdout.write("Count of messages: %s\n" % cnt)
 
 while mess != cnt:
     # Try to retrieve info anyway
@@ -107,7 +108,7 @@ while mess != cnt:
                 token
             )
         except Exception as e:
-            sys.stderr.write('Got error %s, continue...' % e)
+            sys.stderr.write('Got error %s, continue...\n' % e)
             continue
         break
 
@@ -121,7 +122,7 @@ while mess != cnt:
     if result > cnt:
         result = (mess - cnt) + mess
     mess = result
-    sys.stdout.write("Exported %s messages of %s" % (mess, cnt))
+    sys.stdout.write("Exported %s messages of %s\n" % (mess, cnt))
 
 out.close()
-sys.stdout.write('Export done!')
+sys.stdout.write('Export done!\n')
