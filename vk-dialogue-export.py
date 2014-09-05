@@ -16,10 +16,18 @@ import ConfigParser
 
 Config = ConfigParser.ConfigParser()
 Config.read("config.ini")
+
 login = Config.get("auth", "username")
 password = Config.get("auth", "password")
-dialogue_id = Config.getint("dump", "interlocutor.id")
+messages_id = Config.get("messages", "id")
+messages_type = Config.get("messages", "type")
 
+if messages_type == "interlocutor":
+    is_chat = False
+elif messages_type == "chat":
+    is_chat = True
+else:
+    sys.exit("Messages type must be either interlocutor or chat.")
 
 def api(method, params, token):
     params.append(("access_token", token))
@@ -37,13 +45,13 @@ except RuntimeError:
 
 print "vk autorized"
 
-messages = api("messages.getHistory", [("uid", dialogue_id)], token)
+messages = api("messages.getHistory", [("uid" if not is_chat else "chat_id", messages_id)], token)
 
 cnt = messages[0]
 print "Count of messages: %s" % cnt
 time.sleep(1)
 
-out = codecs.open('vk_exported_dialogue_ui%s.txt' % dialogue_id, "w+", "utf-8")
+out = codecs.open(('vk_exported_dialogue_ui%s.txt' if not is_chat else 'vk_exported_dialogue_c%s.txt') % messages_id, "w+", "utf-8")
 
 human_uids = []
 human_uids.append(messages[1]["uid"])
@@ -54,7 +62,6 @@ for i in range(1, 100):
     try:
         if messages[i]["uid"] != human_uids[0]:
             human_uids.append(messages[i]["uid"])
-            break
     except IndexError:
         pass
 
@@ -62,15 +69,17 @@ for i in range(1, 100):
 human_details = api("users.get",
                     [("uids", ','.join(str(v) for v in human_uids))],
                     token)
-
+human_details_index = {}
+for human_detail in human_details:
+    human_details_index[human_detail["uid"]] = human_detail
 
 def write_message(who, to_write):
     date = datetime.datetime.fromtimestamp(
         int(to_write["date"])).strftime('%Y-%m-%d %H:%M:%S')
     out.write("[" + date + "] " +
-              human_details[who]["first_name"] +
+              human_details_index[who]["first_name"] +
               " " +
-              human_details[who]["last_name"] +
+              human_details_index[who]["last_name"] +
               ":\n" +
               to_write["body"].replace('<br>', '\n') +
               '\n\n\n')
@@ -82,7 +91,7 @@ while mess != cnt:
     while True:
         try:
             message_part = api("messages.getHistory",
-                               [("uid", dialogue_id),
+                               [("uid" if not is_chat else "chat_id", messages_id),
                                 ("offset", mess),
                                 ("count", max_part),
                                 ("rev", 1)],
@@ -93,10 +102,7 @@ while mess != cnt:
 
     try:
         for i in range(1, 201):
-            if message_part[i]["uid"] == human_uids[0]:
-                write_message(0, message_part[i])
-            else:
-                write_message(1, message_part[i])
+            write_message(message_part[i]["uid"], message_part[i])
     except IndexError:
         break
 
