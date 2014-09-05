@@ -1,23 +1,11 @@
 # vk-dialogue-export.py
 ## VKontakte Dialogue Exporter
 
-A tool to export dialogue with specific interlocutor.
+A tool to export dialogue with specific interlocutor or chat.
 
 ## USAGE
 
-Edit vk-dialogue-export.py file and run.
-At the top of script:
-
-	#############################
-
-	# vk login/password
-	login = 'example@yandex.com'
-	password = 'password'
-
-	# ID of the interlocutor
-	dialog_id = 111111111
-
-	#############################
+Edit config.ini file and run.
 
 
 ### NOTES
