@@ -45,13 +45,16 @@ except RuntimeError:
 
 print "vk autorized"
 
-messages = api("messages.getHistory", [("uid" if not is_chat else "chat_id", messages_id)], token)
+selector = "uid" if not is_chat else "chat_id"
+messages = api("messages.getHistory", [(selector, messages_id)], token)
 
 cnt = messages[0]
 print "Count of messages: %s" % cnt
 time.sleep(1)
 
-out = codecs.open(('vk_exported_dialogue_ui%s.txt' if not is_chat else 'vk_exported_dialogue_c%s.txt') % messages_id, "w+", "utf-8")
+file_suffix = ('ui' if not is_chat else 'c')
+filename = ('vk_exported_dialogue_' + file_suffix + "%s.txt") % messages_id
+out = codecs.open(filename, "w+", "utf-8")
 
 human_uids = []
 human_uids.append(messages[1]["uid"])
@@ -88,10 +91,11 @@ mess = 0
 max_part = 200  # Due to vk.api
 while mess != cnt:
     # Try to retrieve info anyway
+    selector = "uid" if not is_chat else "chat_id"
     while True:
         try:
             message_part = api("messages.getHistory",
-                               [("uid" if not is_chat else "chat_id", messages_id),
+                               [(selector, messages_id),
                                 ("offset", mess),
                                 ("count", max_part),
                                 ("rev", 1)],

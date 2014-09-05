@@ -1,7 +1,7 @@
 # vk-dialogue-export.py
 ## VKontakte Dialogue Exporter
 
-A tool to export dialogue with specific interlocutor.
+A tool to export dialogue with specific interlocutor or chat.
 
 ## USAGE
 
